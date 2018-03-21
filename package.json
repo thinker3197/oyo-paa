@@ -1,0 +1,29 @@
+{
+  "name": "oyo-paa",
+  "version": "1.0.0",
+  "description": "oyo hotel price analyzer",
+  "main": "index.js",
+  "scripts": {
+    "app": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thinker3197/oyo-paa.git"
+  },
+  "keywords": [
+    "oyo",
+    "hotels",
+    "price",
+    "alert"
+  ],
+  "author": "thikner3197",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/thinker3197/oyo-paa/issues"
+  },
+  "homepage": "https://github.com/thinker3197/oyo-paa#readme",
+  "dependencies": {
+    "request-promise": "^4.2.2"
+  }
+}
