@@ -1,7 +1,10 @@
+const firebase = require('firebase');
 const request = require('request-promise');
 const dateUtil = require('date-and-time');
 
-const getHotels = (city, count, checkin, checkout) => {
+const firebaseConfig = require('./firebaseConfig.js');
+
+function getHotels(city, count, checkin, checkout) {
   const oyoHotelsAPI = 'https://www.oyorooms.com/api/search/hotels';
 
   const params = {
@@ -26,6 +29,12 @@ const getHotels = (city, count, checkin, checkout) => {
 }
 
 function init() {
+  try {
+    firebase.initializeApp(firebaseConfig);
+  } catch (err) {
+    console.error('Firebase intialization failed!!!');
+  }
+
   const cities = [{
     name: 'delhi',
     hotels: 419
@@ -48,11 +57,33 @@ function init() {
   const tomorrow = dateUtil.format(dateUtil.addDays(now, 1), 'DD/MM/YYYY');
 
   cities.map(city => {
-    getHotels(city.name, city.hotels, today, tomorrow).then(res => {
-      const data = JSON.parse(res);
+    console.log(`Creating log [${today}]: ${city.name}`);
 
-      console.log(data.hotels.length);
-    })
+    getHotels(city.name, 10, today, tomorrow)
+      .then(res => {
+        const data = JSON.parse(res);
+        const hotels = data.hotels;
+
+        hotels.map(hotel => {
+          const ref = '/' + city.name + '/' + hotel.id;
+
+          const id = hotel.id,
+            name = hotel.name,
+            price = hotel.reduced_room_pricing[0] || hotel.pricing_info[0];
+
+          console.log(`Writing node ${ref}: ${id}`);
+
+          try {
+            firebase.database().ref(ref).push({
+              id: id,
+              name: name,
+              price: price
+            });
+          } catch (err) {
+            console.error('Write operation to firebase failed!!!');
+          }
+        });
+      });
   });
 }
 
