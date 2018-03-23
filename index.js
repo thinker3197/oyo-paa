@@ -1,11 +1,21 @@
-const firebase = require('firebase');
 const request = require('request-promise');
-// const dateUtil = require('date-and-time');
 const moment = require('moment-timezone');
 
-const firebaseConfig = require('./firebaseConfig.js');
+const database = require('./firebase.js');
 
 let _COUNT_ = 0;
+
+function goOfflineOnceDone() {
+  const id = setInterval(() => {
+    if(_COUNT_ === 500) {
+      clearInterval(id);
+      
+      _COUNT_ = 0;
+      
+      database.goOffline();
+    }
+  }, 1000);
+}
 
 function getHotels(city, count, checkin, checkout) {
   const oyoHotelsAPI = 'https://www.oyorooms.com/api/search/hotels';
@@ -32,12 +42,8 @@ function getHotels(city, count, checkin, checkout) {
 }
 
 function init() {
-  try { 
-    firebase.initializeApp(firebaseConfig);
-  } catch (err) {
-    console.error('Firebase intialization failed!!!', err);
-  }
-
+  database.goOnline();
+  
   const cities = [{
     name: 'delhi',
     hotels: 419
@@ -75,10 +81,8 @@ function init() {
             name = hotel.name,
             price = hotel.reduced_room_pricing[0] || hotel.pricing_info[0];
 
-          const database = firebase.database().ref(ref);
-
           try {
-            const p = database.push({
+            const p = database.ref(ref).push({
               id: id,
               name: name,
               price: price,
@@ -96,14 +100,9 @@ function init() {
         });
       });
   });
+
+  goOfflineOnceDone();
 }
 
-const id = setInterval(() => {
-  if(_COUNT_ === 500) {
-    clearInterval(id);
-
-    firebase.database().goOffline();
-  }
-}, 1000);
 
 module.exports = init;

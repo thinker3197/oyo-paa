@@ -1,3 +1,5 @@
+const firebase = require('firebase');
+
 const config = {
   apiKey: "AIzaSyALjqmgkTQa6zaKHx8qCR-FWM-whOpeclg",
   authDomain: "oyo-paa.firebaseapp.com",
@@ -7,4 +9,6 @@ const config = {
   messagingSenderId: "434104200190"
 };
 
-module.exports = config;
+const app = firebase.initializeApp(config);
+
+module.exports = firebase.database();
