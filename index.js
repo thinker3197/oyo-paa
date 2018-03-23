@@ -57,6 +57,7 @@ function init() {
   const now = new Date();
   const today = dateUtil.format(now, 'DD/MM/YYYY');
   const tomorrow = dateUtil.format(dateUtil.addDays(now, 1), 'DD/MM/YYYY');
+  const timestamp = dateUtil.format(now, 'DD-MM-YY HH:mm:ss');
 
   cities.map(city => {
     getHotels(city.name, 100, today, tomorrow)
@@ -64,7 +65,7 @@ function init() {
         const data = JSON.parse(res);
         const hotels = data.hotels;
 
-        console.log(`Creating log [${today}]: ${city.name}`);
+        console.log(`${timestamp}: Creating log [${today}]: ${city.name}`);
 
         hotels.map(hotel => {
           const ref = '/' + city.name + '/' + hotel.id;
@@ -79,7 +80,8 @@ function init() {
             const p = database.push({
               id: id,
               name: name,
-              price: price
+              price: price,
+              timestamp: timestamp
             });
 
             p.then(() => {
@@ -95,8 +97,6 @@ function init() {
   });
 }
 
-init();
-
 const id = setInterval(() => {
   if(_COUNT_ === 500) {
     clearInterval(id);
@@ -104,3 +104,5 @@ const id = setInterval(() => {
     firebase.database().goOffline();
   }
 }, 1000);
+
+module.exports = init;
