@@ -1,6 +1,7 @@
 const firebase = require('firebase');
 const request = require('request-promise');
-const dateUtil = require('date-and-time');
+// const dateUtil = require('date-and-time');
+const moment = require('moment-timezone');
 
 const firebaseConfig = require('./firebaseConfig.js');
 
@@ -31,10 +32,10 @@ function getHotels(city, count, checkin, checkout) {
 }
 
 function init() {
-  try {
+  try { 
     firebase.initializeApp(firebaseConfig);
   } catch (err) {
-    console.error('Firebase intialization failed!!!');
+    console.error('Firebase intialization failed!!!', err);
   }
 
   const cities = [{
@@ -54,10 +55,10 @@ function init() {
     hotels: 197
   }];
 
-  const now = new Date();
-  const today = dateUtil.format(now, 'DD/MM/YYYY');
-  const tomorrow = dateUtil.format(dateUtil.addDays(now, 1), 'DD/MM/YYYY');
-  const timestamp = dateUtil.format(now, 'DD-MM-YY HH:mm:ss');
+  const now = moment().tz("Asia/Kolkata");
+  const today = now.format('DD/MM/YYYY');
+  const tomorrow = now.add(1, 'days').format('DD/MM/YYYY');
+  const timestamp = now.format('lll');
 
   cities.map(city => {
     getHotels(city.name, 100, today, tomorrow)
