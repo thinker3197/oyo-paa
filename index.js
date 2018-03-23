@@ -57,12 +57,12 @@ function init() {
   const tomorrow = dateUtil.format(dateUtil.addDays(now, 1), 'DD/MM/YYYY');
 
   cities.map(city => {
-    console.log(`Creating log [${today}]: ${city.name}`);
-
-    getHotels(city.name, 10, today, tomorrow)
+    getHotels(city.name, 100, today, tomorrow)
       .then(res => {
         const data = JSON.parse(res);
         const hotels = data.hotels;
+
+        console.log(`Creating log [${today}]: ${city.name}`);
 
         hotels.map(hotel => {
           const ref = '/' + city.name + '/' + hotel.id;
@@ -71,13 +71,17 @@ function init() {
             name = hotel.name,
             price = hotel.reduced_room_pricing[0] || hotel.pricing_info[0];
 
-          console.log(`Writing node ${ref}: ${id}`);
+          const database = firebase.database().ref(ref);
 
           try {
-            firebase.database().ref(ref).push({
+            const p = database.push({
               id: id,
               name: name,
               price: price
+            });
+
+            p.then(() => {
+              console.log(`Writing node ${ref}: ${id}`);
             });
           } catch (err) {
             console.error('Write operation to firebase failed!!!');
