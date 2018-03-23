@@ -4,6 +4,8 @@ const dateUtil = require('date-and-time');
 
 const firebaseConfig = require('./firebaseConfig.js');
 
+let _COUNT_ = 0;
+
 function getHotels(city, count, checkin, checkout) {
   const oyoHotelsAPI = 'https://www.oyorooms.com/api/search/hotels';
 
@@ -81,6 +83,8 @@ function init() {
             });
 
             p.then(() => {
+              _COUNT_++;
+
               console.log(`Writing node ${ref}: ${id}`);
             });
           } catch (err) {
@@ -92,3 +96,11 @@ function init() {
 }
 
 init();
+
+const id = setInterval(() => {
+  if(_COUNT_ === 500) {
+    clearInterval(id);
+
+    firebase.database().goOffline();
+  }
+}, 1000);
